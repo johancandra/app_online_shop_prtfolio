@@ -311,6 +311,20 @@ class Display extends CI_Controller {
 		$data['sliding'] = $this->get_sliding_data();
 		$data['product'] = $this->get_list_data($page,$length,$sub_type,$sort,$sort_type);
 		$data['promo'] = $this->get_promo_data();
+		$data['chart'] = json_decode('[]');
+		$newdata = array();
+		$newdata['id'] = $this->session->userdata('id');
+		$newdata['email'] = $this->session->userdata('email');
+		$newdata['fullname'] = $this->session->userdata('fullname');
+		$newdata['firstname'] = $this->session->userdata('firstname');
+        $this->load->model('display_Model');
+        $result = $this->display_Model->get_chart($newdata['id']);
+        $data['chart'] = json_decode($result[0]->chart);
+		for ($c = 0; $c < count($data['chart']); $c++) {
+			$data['chart'][$c]->product_name = $this->display_Model->get_product($data['chart'][$c]->product_id)[0]->name;
+		}
+		$newdata['chart'] = $data['chart'];
+		$this->session->set_userdata($newdata);
 		$this->load->view('display',$data);
 	}
 
